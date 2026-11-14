@@ -179,8 +179,34 @@ import { AuthService } from '../../services/auth.service';
       }
 
       @media (max-width: 768px) {
+        .login-backdrop {
+          padding: 14px;
+          align-items: flex-start;
+        }
+
+        .login-container {
+          gap: 14px;
+        }
+
+        .login-header {
+          padding: 16px;
+        }
+
+        .brand-title {
+          font-size: 15.5px;
+        }
+
+        .brand-subtitle {
+          font-size: 12px;
+        }
+
         .access-grid {
           grid-template-columns: 1fr;
+          gap: 14px;
+        }
+
+        .access-card {
+          padding: 18px;
         }
       }
 

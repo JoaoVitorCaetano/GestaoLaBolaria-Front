@@ -1,7 +1,47 @@
 @if (!auth.autenticado()) {
   <router-outlet></router-outlet>
 } @else {
-  <div class="shell-layout" [class.collapsed]="sidebarCollapsed()">
+  <!-- MOBILE / TABLET HEADER BAR (VISIBLE <= 900px) -->
+  <header class="mobile-nav-bar">
+    <button
+      type="button"
+      class="mobile-menu-btn"
+      (click)="toggleMobileMenu()"
+      aria-label="Abrir menu"
+    >
+      <svg class="svg-icon" viewBox="0 0 24 24">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+
+    <div class="mobile-brand">
+      <div class="company-logo sm">
+        <svg class="svg-icon xs" viewBox="0 0 24 24">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+          <path d="M2 17l10 5 10-5" />
+          <path d="M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <span class="company-name">La Bolaria</span>
+    </div>
+
+    <div class="mobile-mode-indicator">
+      <span class="status-dot" [class.demo]="auth.isDemo()" [class.real]="auth.isReal()"></span>
+      <span class="mode-label">{{ auth.isDemo() ? 'Demo' : 'Prod' }}</span>
+    </div>
+  </header>
+
+  @if (mobileMenuOpen()) {
+    <div class="mobile-drawer-backdrop" (click)="closeMobileMenu()"></div>
+  }
+
+  <div
+    class="shell-layout"
+    [class.collapsed]="sidebarCollapsed()"
+    [class.mobile-open]="mobileMenuOpen()"
+  >
     <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
       <!-- Company Card -->
@@ -23,7 +63,7 @@
         }
         <button
           type="button"
-          class="collapse-btn"
+          class="collapse-btn desktop-only"
           (click)="toggleSidebar()"
           [title]="sidebarCollapsed() ? 'Expandir menu lateral' : 'Recolher menu lateral'"
         >
@@ -35,6 +75,17 @@
               <polyline points="11 17 6 12 11 7" />
               <polyline points="18 17 13 12 18 7" />
             }
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="collapse-btn mobile-only"
+          (click)="closeMobileMenu()"
+          title="Fechar menu"
+        >
+          <svg class="svg-icon sm" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
@@ -50,6 +101,7 @@
             routerLinkActive="active"
             class="nav-item"
             title="Catálogo de Produtos"
+            (click)="closeMobileMenu()"
           >
             <svg class="svg-icon" viewBox="0 0 24 24">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -67,6 +119,7 @@
             routerLinkActive="active"
             class="nav-item"
             title="Estoque de Insumos"
+            (click)="closeMobileMenu()"
           >
             <svg class="svg-icon" viewBox="0 0 24 24">
               <ellipse cx="12" cy="5" rx="9" ry="3" />
@@ -86,22 +139,42 @@
         <div class="nav-section">
           <div class="nav-section-title">LINHAS DE PRODUÇÃO</div>
           <div class="workspace-list">
-            <a routerLink="/produtos" [queryParams]="{ cat: 'CASEIRO_TRADICIONAL' }" class="ws-item">
+            <a
+              routerLink="/produtos"
+              [queryParams]="{ cat: 'CASEIRO_TRADICIONAL' }"
+              class="ws-item"
+              (click)="closeMobileMenu()"
+            >
               <span class="ws-dot purple"></span>
               <span class="ws-name">Caseiros e Broas</span>
               <span class="nav-pill">{{ auth.isDemo() ? '3' : '35' }}</span>
             </a>
-            <a routerLink="/produtos" [queryParams]="{ cat: 'VULCAO' }" class="ws-item">
+            <a
+              routerLink="/produtos"
+              [queryParams]="{ cat: 'VULCAO' }"
+              class="ws-item"
+              (click)="closeMobileMenu()"
+            >
               <span class="ws-dot orange"></span>
               <span class="ws-name">Vulcão e Piscininha</span>
               <span class="nav-pill">{{ auth.isDemo() ? '3' : '31' }}</span>
             </a>
-            <a routerLink="/produtos" [queryParams]="{ cat: 'RECHEADO_FESTA' }" class="ws-item">
+            <a
+              routerLink="/produtos"
+              [queryParams]="{ cat: 'RECHEADO_FESTA' }"
+              class="ws-item"
+              (click)="closeMobileMenu()"
+            >
               <span class="ws-dot pink"></span>
               <span class="ws-name">Tortas G34 (2000ml)</span>
               <span class="nav-pill">{{ auth.isDemo() ? '2' : '6' }}</span>
             </a>
-            <a routerLink="/produtos" [queryParams]="{ cat: 'POTE' }" class="ws-item">
+            <a
+              routerLink="/produtos"
+              [queryParams]="{ cat: 'POTE' }"
+              class="ws-item"
+              (click)="closeMobileMenu()"
+            >
               <span class="ws-dot green"></span>
               <span class="ws-name">Bolos no Pote</span>
               <span class="nav-pill">{{ auth.isDemo() ? '2' : '16' }}</span>

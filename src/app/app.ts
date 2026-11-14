@@ -12,8 +12,17 @@ import { AuthService } from './services/auth.service';
 export class App {
   readonly auth = inject(AuthService);
   sidebarCollapsed = signal(false);
+  mobileMenuOpen = signal(false);
 
   toggleSidebar(): void {
     this.sidebarCollapsed.update((v) => !v);
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen.update((v) => !v);
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
   }
 }
