@@ -9,369 +9,234 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="login-backdrop">
-      <div class="login-container">
-        <!-- Brand Header -->
-        <div class="login-header">
-          <div class="brand-badge">
-            <div class="brand-logo">
-              <svg class="svg-icon" viewBox="0 0 24 24">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <div>
-              <h1 class="brand-title">La Bolaria — ERP &amp; Receituário</h1>
-              <p class="brand-subtitle">
-                Sistema de Engenharia de Cardápio, Fichas Técnicas e Cálculo de CMV
-              </p>
-            </div>
+    <div class="login-screen">
+      <div class="login-box">
+        <!-- Brand -->
+        <div class="brand">
+          <div class="brand-icon">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
           </div>
+          <h1 class="brand-name">La Bolaria</h1>
+          <p class="brand-sub">Gestão de Insumos &amp; Fichas Técnicas</p>
         </div>
 
-        <div class="access-grid">
-          <!-- CARD 1: MODO DEMO / PORTFÓLIO (RECRUTADORES) -->
-          <div class="access-card demo-card">
-            <div class="card-tag demo-tag">PORTFÓLIO / VISITANTE</div>
-            <h2 class="card-title">Explorar Modo Demonstração</h2>
-            <p class="card-desc">
-              Ideal para <strong>recrutadores e visitantes</strong>. Teste todas as funcionalidades
-              do sistema (criação de produtos, estoque de insumos, fichas técnicas e cálculo automático
-              de CMV e lucro) com <strong>receitas fictícias</strong>.
-            </p>
-
-            <ul class="feature-list">
-              <li>✓ Acesso imediato em 1 clique (sem senha)</li>
-              <li>✓ Receitas e custos fictícios pré-carregados</li>
-              <li>✓ Liberdade para criar, editar e excluir itens</li>
-              <li>✓ Dados originais da confeitaria 100% protegidos</li>
-            </ul>
-
+        <!-- Produção Form -->
+        <form (ngSubmit)="entrarConfeitaria()" class="auth-form">
+          <div class="input-group">
+            <input
+              id="senhaInput"
+              [type]="mostrarSenha() ? 'text' : 'password'"
+              [(ngModel)]="senha"
+              name="senha"
+              placeholder="Senha de acesso..."
+              autocomplete="current-password"
+              required
+            />
             <button
               type="button"
-              class="btn-action btn-demo"
-              (click)="entrarDemo()"
+              class="eye-btn"
+              (click)="mostrarSenha.set(!mostrarSenha())"
             >
-              <span>Entrar como Visitante (Modo Demo)</span>
-              <svg class="svg-icon sm" viewBox="0 0 24 24">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
+              {{ mostrarSenha() ? 'Ocultar' : 'Ver' }}
             </button>
           </div>
 
-          <!-- CARD 2: ACESSO RESTRITO CONFEITARIA (PRODUÇÃO) -->
-          <div class="access-card prod-card">
-            <div class="card-tag prod-tag">AMBIENTE DE PRODUÇÃO</div>
-            <h2 class="card-title">Acesso Restrito — La Bolaria</h2>
-            <p class="card-desc">
-              Acesso exclusivo para a equipe interna da confeitaria, conectado ao banco de dados
-              oficial de produção e ao receituário confidencial.
-            </p>
+          @if (erro()) {
+            <div class="error-msg">{{ erro() }}</div>
+          }
 
-            <form (ngSubmit)="entrarConfeitaria()" class="login-form">
-              <div class="field-group">
-                <label for="senhaInput">Chave de Acesso da Confeitaria</label>
-                <div class="password-wrapper">
-                  <input
-                    id="senhaInput"
-                    [type]="mostrarSenha() ? 'text' : 'password'"
-                    [(ngModel)]="senha"
-                    name="senha"
-                    placeholder="Digite a senha de acesso..."
-                    autocomplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    class="toggle-pass"
-                    (click)="mostrarSenha.set(!mostrarSenha())"
-                    title="Mostrar/ocultar senha"
-                  >
-                    {{ mostrarSenha() ? 'Ocultar' : 'Mostrar' }}
-                  </button>
-                </div>
-              </div>
+          <button type="submit" class="btn-primary" [disabled]="validando()">
+            {{ validando() ? 'Entrando...' : 'Entrar na Produção' }}
+          </button>
+        </form>
 
-              @if (erro()) {
-                <div class="login-error">
-                  {{ erro() }}
-                </div>
-              }
-
-              <button
-                type="submit"
-                class="btn-action btn-prod"
-                [disabled]="validando()"
-              >
-                <span>{{ validando() ? 'Verificando...' : 'Acessar Sistema Oficial' }}</span>
-              </button>
-            </form>
-          </div>
+        <div class="divider">
+          <span>ou</span>
         </div>
+
+        <!-- Demo Button -->
+        <button type="button" class="btn-demo" (click)="entrarDemo()">
+          Explorar Modo Demonstração
+        </button>
+        <p class="demo-hint">Acesso sem senha com receitas fictícias</p>
       </div>
     </div>
   `,
   styles: [
     `
-      .login-backdrop {
-        min-height: 100vh;
+      .login-screen {
+        min-height: 100dvh;
         width: 100%;
-        background: linear-gradient(135deg, #f8f9fb 0%, #eef1f6 100%);
+        background: #f8f9fb;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 24px;
+        padding: 20px;
       }
 
-      .login-container {
+      .login-box {
         width: 100%;
-        max-width: 880px;
+        max-width: 360px;
+        background: #ffffff;
+        border: 1px solid #eaecf0;
+        border-radius: 12px;
+        padding: 28px 24px;
+        box-shadow: 0 2px 10px rgba(16, 24, 40, 0.03);
         display: flex;
         flex-direction: column;
-        gap: 24px;
       }
 
-      .login-header {
-        background: #ffffff;
-        border: 1px solid #e4e7ec;
-        border-radius: 14px;
-        padding: 20px 24px;
-        box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
-      }
-
-      .brand-badge {
+      .brand {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 14px;
+        text-align: center;
+        margin-bottom: 22px;
       }
 
-      .brand-logo {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
+      .brand-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
         background: #18181b;
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        margin-bottom: 10px;
       }
 
-      .brand-title {
-        font-size: 18px;
+      .brand-name {
+        font-size: 17px;
         font-weight: 700;
         color: #101828;
-        margin: 0 0 2px 0;
+        margin: 0 0 3px 0;
       }
 
-      .brand-subtitle {
-        font-size: 13px;
+      .brand-sub {
+        font-size: 12.5px;
         color: #667085;
         margin: 0;
       }
 
-      .access-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-
-      @media (max-width: 768px) {
-        .login-backdrop {
-          padding: 14px;
-          align-items: flex-start;
-        }
-
-        .login-container {
-          gap: 14px;
-        }
-
-        .login-header {
-          padding: 16px;
-        }
-
-        .brand-title {
-          font-size: 15.5px;
-        }
-
-        .brand-subtitle {
-          font-size: 12px;
-        }
-
-        .access-grid {
-          grid-template-columns: 1fr;
-          gap: 14px;
-        }
-
-        .access-card {
-          padding: 18px;
-        }
-      }
-
-      .access-card {
-        background: #ffffff;
-        border: 1px solid #e4e7ec;
-        border-radius: 14px;
-        padding: 26px;
+      .auth-form {
         display: flex;
         flex-direction: column;
-        box-shadow: 0 4px 12px rgba(16, 24, 40, 0.05);
+        gap: 10px;
       }
 
-      .demo-card {
-        border: 2px solid #ff5a1f;
-        position: relative;
-      }
-
-      .card-tag {
-        align-self: flex-start;
-        font-size: 10.5px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        padding: 4px 10px;
-        border-radius: 999px;
-        margin-bottom: 12px;
-      }
-
-      .demo-tag {
-        background: #fff4ed;
-        color: #ff5a1f;
-      }
-
-      .prod-tag {
-        background: #f2f4f7;
-        color: #344054;
-      }
-
-      .card-title {
-        font-size: 17px;
-        font-weight: 700;
-        color: #101828;
-        margin: 0 0 8px 0;
-      }
-
-      .card-desc {
-        font-size: 13px;
-        line-height: 1.55;
-        color: #475467;
-        margin: 0 0 16px 0;
-      }
-
-      .feature-list {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 22px 0;
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-        font-size: 12.5px;
-        color: #344054;
-        flex: 1;
-      }
-
-      .login-form {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        margin-top: auto;
-      }
-
-      .field-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .field-group label {
-        font-size: 12.5px;
-        font-weight: 600;
-        color: #344054;
-      }
-
-      .password-wrapper {
+      .input-group {
         display: flex;
         align-items: center;
         border: 1px solid #d0d5dd;
         border-radius: 8px;
-        overflow: hidden;
         background: #ffffff;
+        overflow: hidden;
+        transition: border-color 0.15s ease;
       }
 
-      .password-wrapper:focus-within {
+      .input-group:focus-within {
         border-color: #18181b;
-        box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
       }
 
-      .password-wrapper input {
+      .input-group input {
         flex: 1;
+        height: 38px;
         border: none;
-        padding: 10px 12px;
-        font-size: 13.5px;
-        outline: none;
+        padding: 0 12px;
+        font-size: 13px;
         color: #101828;
+        outline: none;
+        min-width: 0;
       }
 
-      .toggle-pass {
+      .eye-btn {
         border: none;
         background: transparent;
         color: #667085;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 0 12px;
+        font-size: 11.5px;
+        font-weight: 500;
+        padding: 0 10px;
         cursor: pointer;
       }
 
-      .toggle-pass:hover {
+      .eye-btn:hover {
         color: #101828;
       }
 
-      .login-error {
+      .error-msg {
+        font-size: 12px;
+        color: #b42318;
         background: #fef3f2;
         border: 1px solid #fecdca;
-        color: #b42318;
-        font-size: 12.5px;
-        padding: 8px 12px;
+        border-radius: 6px;
+        padding: 7px 10px;
+      }
+
+      .btn-primary {
+        height: 38px;
         border-radius: 8px;
-      }
-
-      .btn-action {
-        width: 100%;
-        height: 42px;
-        border-radius: 9px;
         border: none;
-        font-size: 13.5px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: all 0.15s ease;
-      }
-
-      .btn-demo {
-        background: #ff5a1f;
-        color: #ffffff;
-      }
-
-      .btn-demo:hover {
-        background: #e04812;
-      }
-
-      .btn-prod {
         background: #18181b;
         color: #ffffff;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease;
       }
 
-      .btn-prod:hover {
+      .btn-primary:hover:not(:disabled) {
         background: #27272a;
       }
 
-      .btn-prod:disabled {
+      .btn-primary:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 16px 0;
+        color: #98a2b3;
+        font-size: 11.5px;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #eaecf0;
+      }
+
+      .btn-demo {
+        height: 38px;
+        border-radius: 8px;
+        border: 1px solid #d0d5dd;
+        background: #ffffff;
+        color: #101828;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .btn-demo:hover {
+        background: #f8f9fb;
+        border-color: #98a2b3;
+      }
+
+      .demo-hint {
+        text-align: center;
+        font-size: 11.5px;
+        color: #667085;
+        margin: 8px 0 0 0;
       }
     `,
   ],
@@ -397,9 +262,7 @@ export class LoginComponent {
       if (ok) {
         this.router.navigate(['/produtos']);
       } else {
-        this.erro.set(
-          'Senha incorreta. Para explorar o portfólio sem senha, utilize o botão "Entrar como Visitante (Modo Demo)".'
-        );
+        this.erro.set('Senha incorreta.');
       }
     } finally {
       this.validando.set(false);
