@@ -248,3 +248,71 @@
   overflow: hidden;
   background: var(--bg-surface);
 }
+
+/* ==================== SIDEBAR FOOTER (MODE / LOGOUT) ==================== */
+.sidebar-footer {
+  margin-top: auto;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.mode-box {
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+}
+
+.mode-box.demo {
+  background: #fff8f5;
+  border-color: #fed7aa;
+}
+
+.mode-box.real {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.mode-badge-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #101828;
+}
+
+.mode-badge-sub {
+  font-size: 11px;
+  color: #475467;
+  margin-bottom: 4px;
+}
+
+.footer-btn {
+  width: 100%;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+  transition: all 0.14s ease;
+}
+
+.footer-btn:hover {
+  background: #f2f4f7;
+  color: #101828;
+}
+
+.reset-btn {
+  border-color: #fdba74;
+  color: #c2410c;
+}
+
+.reset-btn:hover {
+  background: #ffedd5;
+}
