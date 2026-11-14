@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -43,7 +43,7 @@ import {
               CMV Total: R$ {{ ficha()!.custoTotal | number:'1.2-2' }}
             </span>
           }
-          <button class="btn btn-dark" (click)="mostrarModalAdicionar.set(true)">
+          <button class="btn btn-dark" (click)="abrirModalAdicionar()">
             <svg class="svg-icon sm" viewBox="0 0 24 24">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -68,8 +68,8 @@ import {
       }
 
       @if (ficha()) {
-        <!-- TABELA DE ITENS DA RECEITA -->
-        <div class="table-wrapper" style="margin-top: 20px; margin-bottom: 32px;">
+        <!-- TABELA DE ITENS DA RECEITA (DESKTOP) -->
+        <div class="table-wrapper desktop-table-only" style="margin-top: 20px; margin-bottom: 32px;">
           <table class="ux-table">
             <thead>
               <tr>
@@ -167,7 +167,7 @@ import {
           <div class="table-bottom-strip">
             <span
               style="cursor: pointer; font-weight: 600;"
-              (click)="mostrarModalAdicionar.set(true)"
+              (click)="abrirModalAdicionar()"
             >
               + Adicionar novo insumo à receita
             </span>
@@ -177,9 +177,67 @@ import {
             </span>
           </div>
         </div>
+
+        <!-- CARDS MINIMALISTAS (MOBILE) -->
+        <div class="mobile-cards-list" style="margin-top: 12px; margin-bottom: 24px;">
+          @for (item of ficha()!.itens; track item.id) {
+            <div class="min-card">
+              <div class="min-card-top">
+                <span class="min-card-title">{{ item.nomeIngrediente }}</span>
+                <span class="min-card-tag">{{ item.unidadeMedida }}</span>
+              </div>
+
+              <div class="min-card-metrics">
+                <div class="min-metric">
+                  <span class="min-metric-label">Quantidade</span>
+                  @if (editandoItemId() === item.id) {
+                    <input
+                      type="number"
+                      step="0.001"
+                      min="0.001"
+                      [(ngModel)]="quantidadeEdicao"
+                      style="width: 80px; height: 26px; padding: 0 6px; border: 1px solid #ff5a1f; border-radius: 5px; font-size: 12px;"
+                    />
+                  } @else {
+                    <span class="min-metric-val">
+                      {{ item.quantidade | number:'1.0-3' }} {{ sigla(item.unidadeMedida) }}
+                    </span>
+                  }
+                </div>
+                <div class="min-metric">
+                  <span class="min-metric-label">Subtotal</span>
+                  <span class="min-metric-val">R$ {{ item.custoSubtotal | number:'1.2-4' }}</span>
+                </div>
+                <div class="min-metric">
+                  <span class="min-metric-label">Part. Custo</span>
+                  <span class="min-metric-val positive">{{ percentualCusto(item) | number:'1.0-1' }}%</span>
+                </div>
+              </div>
+
+              <div class="min-card-bottom">
+                <div class="min-card-actions">
+                  @if (editandoItemId() === item.id) {
+                    <button class="min-btn" style="color: #ff5a1f; border-color: #ff5a1f;" (click)="salvarEdicaoQuantidade(item)">
+                      Salvar
+                    </button>
+                    <button class="min-btn" (click)="cancelarEdicao()">Cancelar</button>
+                  } @else {
+                    <button class="min-btn" (click)="iniciarEdicao(item)">Alterar Qtd</button>
+                    <button class="min-btn danger" (click)="removerItem(item)" title="Remover">
+                      <svg class="svg-icon xs" viewBox="0 0 24 24">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
       }
 
-      <!-- MODAL ADICIONAR INGREDIENTE -->
+      <!-- MODAL ADICIONAR INGREDIENTE (COM SELETOR PESQUISÁVEL COMPACTO QUE NÃO SOBE/QUEBRA) -->
       @if (mostrarModalAdicionar()) {
         <div class="modal-backdrop" (click)="mostrarModalAdicionar.set(false)">
           <div class="modal-card" (click)="$event.stopPropagation()">
@@ -196,18 +254,32 @@ import {
               <div class="modal-body">
                 <div class="form-field">
                   <label>Selecione o Insumo / Preparo *</label>
-                  <select
-                    [(ngModel)]="novoIngredienteId"
-                    name="ingredienteId"
-                    required
-                  >
-                    <option [ngValue]="null" disabled>Escolha um insumo...</option>
-                    @for (ing of ingredientesDisponiveis(); track ing.id) {
-                      <option [ngValue]="ing.id">
-                        {{ ing.name }} ({{ ing.unidadeMedida }} — R$ {{ ing.custoUnitarioBase | number:'1.4-4' }})
-                      </option>
+                  <input
+                    type="text"
+                    placeholder="Filtrar insumo pelo nome..."
+                    [ngModel]="buscaInsumoModal()"
+                    (ngModelChange)="buscaInsumoModal.set($event)"
+                    name="buscaInsumo"
+                    autocomplete="off"
+                  />
+
+                  <div class="insumo-picker-list">
+                    @for (ing of ingredientesFiltradosModal(); track ing.id) {
+                      <button
+                        type="button"
+                        class="insumo-picker-item"
+                        [class.selected]="novoIngredienteId === ing.id"
+                        (click)="selecionarInsumoModal(ing)"
+                      >
+                        <span class="insumo-picker-name">{{ ing.name }}</span>
+                        <span class="insumo-picker-meta">
+                          {{ sigla(ing.unidadeMedida) }} · R$ {{ ing.custoUnitarioBase | number:'1.4-4' }}
+                        </span>
+                      </button>
+                    } @empty {
+                      <div class="insumo-picker-empty">Nenhum insumo encontrado.</div>
                     }
-                  </select>
+                  </div>
                 </div>
 
                 <div class="form-field">
@@ -246,6 +318,72 @@ import {
       }
     </div>
   `,
+  styles: [
+    `
+      .insumo-picker-list {
+        max-height: 176px;
+        overflow-y: auto;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .insumo-picker-item {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #f2f4f7;
+        background: transparent;
+        padding: 8px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        text-align: left;
+        cursor: pointer;
+        font-size: 12.5px;
+        color: var(--text-primary);
+        transition: background 0.12s ease;
+      }
+
+      .insumo-picker-item:last-child {
+        border-bottom: none;
+      }
+
+      .insumo-picker-item:hover {
+        background: #f8f9fb;
+      }
+
+      .insumo-picker-item.selected {
+        background: #fff4ed;
+        color: #c2410c;
+        font-weight: 600;
+      }
+
+      .insumo-picker-name {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .insumo-picker-meta {
+        font-size: 11px;
+        color: var(--text-muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .insumo-picker-empty {
+        padding: 14px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+    `,
+  ],
 })
 export class FichaTecnicaComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -259,8 +397,16 @@ export class FichaTecnicaComponent implements OnInit {
   ingredientesDisponiveis = signal<IngredienteResponse[]>([]);
 
   mostrarModalAdicionar = signal(false);
+  buscaInsumoModal = signal('');
   novoIngredienteId: number | null = null;
   novaQuantidade: number | null = null;
+
+  ingredientesFiltradosModal = computed(() => {
+    const termo = this.buscaInsumoModal().trim().toLowerCase();
+    const lista = this.ingredientesDisponiveis();
+    if (!termo) return lista;
+    return lista.filter((i) => i.name.toLowerCase().includes(termo));
+  });
 
   editandoItemId = signal<number | null>(null);
   quantidadeEdicao = 0;
@@ -272,6 +418,17 @@ export class FichaTecnicaComponent implements OnInit {
     this.produtoId = Number(this.route.snapshot.paramMap.get('id'));
     this.carregarDados();
     this.carregarIngredientes();
+  }
+
+  abrirModalAdicionar(): void {
+    this.buscaInsumoModal.set('');
+    this.novoIngredienteId = null;
+    this.novaQuantidade = null;
+    this.mostrarModalAdicionar.set(true);
+  }
+
+  selecionarInsumoModal(ing: IngredienteResponse): void {
+    this.novoIngredienteId = ing.id;
   }
 
   carregarDados(): void {
@@ -306,6 +463,7 @@ export class FichaTecnicaComponent implements OnInit {
           this.sucessoMsg.set('Insumo adicionado à ficha técnica!');
           this.novoIngredienteId = null;
           this.novaQuantidade = null;
+          this.buscaInsumoModal.set('');
           this.mostrarModalAdicionar.set(false);
           this.carregarDados();
         },

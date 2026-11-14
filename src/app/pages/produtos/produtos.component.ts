@@ -122,9 +122,9 @@ import {
         </div>
       </div>
 
-      <!-- TABLE VIEW -->
+      <!-- TABLE VIEW (DESKTOP) -->
       @if (modoExibicao() === 'table') {
-        <div class="table-wrapper">
+        <div class="table-wrapper desktop-table-only">
           <table class="ux-table">
             <thead>
               <tr>
@@ -251,44 +251,51 @@ import {
             <span>Total exibido: {{ produtosFiltrados().length }} produtos</span>
           </div>
         </div>
-      } @else {
-        <!-- CARD GRID VIEW -->
-        <div class="cards-grid-view">
-          @for (p of produtosPaginados(); track p.id) {
-            <div class="ux-grid-card">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-                <span class="status-pill" [ngClass]="classeCategoria(p.categoriaProduto)">
-                  {{ formatarCategoria(p.categoriaProduto) }}
-                </span>
-                <span class="rating-cell">
-                  <svg class="svg-icon xs" style="color: #f59e0b; fill: #f59e0b;" viewBox="0 0 24 24">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                  <span>{{ calcularMargemNota(p) }}</span>
-                </span>
+      }
+
+      <!-- MINIMALIST CARDS (AUTOMATIC ON MOBILE OR WHEN GRID IS SELECTED) -->
+      <div [ngClass]="modoExibicao() === 'grid' ? 'cards-grid-view' : 'mobile-cards-list'">
+        @for (p of produtosPaginados(); track p.id) {
+          <div class="min-card">
+            <div class="min-card-top">
+              <span
+                class="min-card-title"
+                style="cursor: pointer;"
+                (click)="abrirFichaTecnica(p.id)"
+              >
+                {{ p.name }}
+              </span>
+              <span class="min-card-tag">{{ formatarCategoria(p.categoriaProduto) }}</span>
+            </div>
+
+            <div class="min-card-metrics">
+              <div class="min-metric">
+                <span class="min-metric-label">Venda</span>
+                <span class="min-metric-val">R$ {{ p.precoVenda | number:'1.2-2' }}</span>
               </div>
-              <h3 style="font-size: 15px; font-weight: 700;">{{ p.name }}</h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12.5px; color: #475467;">
-                <div>Venda: <strong style="color: #101828;">R$ {{ p.precoVenda | number:'1.2-2' }}</strong></div>
-                <div>CMV: <strong style="color: #101828;">R$ {{ (p.custoTotalReceita || 0) | number:'1.2-2' }}</strong></div>
-                <div>Lucro: <strong style="color: #027a48;">R$ {{ calcularLucro(p) | number:'1.2-2' }}</strong></div>
-                <div>Rendimento: <strong>{{ p.redimentoFatias }} fatias</strong></div>
+              <div class="min-metric">
+                <span class="min-metric-label">CMV</span>
+                <span class="min-metric-val">R$ {{ (p.custoTotalReceita || 0) | number:'1.2-2' }}</span>
               </div>
-              <div style="display: flex; gap: 6px; margin-top: auto; padding-top: 8px; border-top: 1px solid #eaecf0;">
-                <button class="btn btn-sm" style="flex: 1;" (click)="abrirFichaTecnica(p.id)">
-                  <svg class="svg-icon xs" viewBox="0 0 24 24">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                  </svg>
-                  <span>Ficha Técnica</span>
+              <div class="min-metric">
+                <span class="min-metric-label">Lucro ({{ calcularMargemNota(p) }})</span>
+                <span class="min-metric-val positive">R$ {{ calcularLucro(p) | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <div class="min-card-bottom">
+              <span class="min-card-sub">{{ p.redimentoFatias }} fatias/unid</span>
+              <div class="min-card-actions">
+                <button class="min-btn" (click)="abrirFichaTecnica(p.id)">
+                  <span>Receita</span>
                 </button>
-                <button class="btn btn-sm" (click)="abrirEdicao(p)" title="Editar">
+                <button class="min-btn" (click)="abrirEdicao(p)" title="Editar">
                   <svg class="svg-icon xs" viewBox="0 0 24 24">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button class="btn btn-sm" style="color: #b42318;" (click)="excluir(p)" title="Excluir">
+                <button class="min-btn danger" (click)="excluir(p)" title="Excluir">
                   <svg class="svg-icon xs" viewBox="0 0 24 24">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -296,9 +303,9 @@ import {
                 </button>
               </div>
             </div>
-          }
-        </div>
-      }
+          </div>
+        }
+      </div>
 
       <!-- FLOATING BULK ACTION BAR -->
       @if (selecionados().size > 0) {

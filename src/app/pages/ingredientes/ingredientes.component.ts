@@ -178,8 +178,8 @@ import {
         </div>
       }
 
-      <!-- TABLE -->
-      <div class="table-wrapper">
+      <!-- TABLE (DESKTOP) -->
+      <div class="table-wrapper desktop-table-only">
         <table class="ux-table">
           <thead>
             <tr>
@@ -285,6 +285,60 @@ import {
           </span>
           <span>Total exibido: {{ ingredientesFiltrados().length }} insumos</span>
         </div>
+      </div>
+
+      <!-- MINIMALIST CARDS (AUTOMATIC ON MOBILE) -->
+      <div class="mobile-cards-list">
+        @for (item of ingredientesPaginados(); track item.id) {
+          <div class="min-card">
+            <div class="min-card-top">
+              <span class="min-card-title">{{ item.name }}</span>
+              <span class="min-card-tag">{{ item.unidadeMedida }}</span>
+            </div>
+
+            <div class="min-card-metrics">
+              <div class="min-metric">
+                <span class="min-metric-label">Custo Base</span>
+                <span class="min-metric-val">
+                  R$ {{ item.custoUnitarioBase | number:'1.4-4' }}
+                </span>
+              </div>
+              <div class="min-metric">
+                <span class="min-metric-label">
+                  Por {{ item.unidadeMedida === 'UNIDADE' ? 'un' : item.unidadeMedida === 'GRAMA' ? 'kg' : 'L' }}
+                </span>
+                <span class="min-metric-val">
+                  @if (item.unidadeMedida === 'UNIDADE') {
+                    R$ {{ item.custoUnitarioBase | number:'1.2-2' }}
+                  } @else {
+                    R$ {{ (item.custoUnitarioBase * 1000) | number:'1.2-2' }}
+                  }
+                </span>
+              </div>
+              <div class="min-metric">
+                <span class="min-metric-label">Estoque</span>
+                <span class="min-metric-val">
+                  {{ item.estoqueAtual | number:'1.0-1' }} {{ sigla(item.unidadeMedida) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="min-card-bottom">
+              <span class="min-card-sub">{{ statusEstoqueTexto(item) }}</span>
+              <div class="min-card-actions">
+                <button class="min-btn" (click)="abrirEdicao(item)">
+                  <span>Editar</span>
+                </button>
+                <button class="min-btn danger" (click)="excluir(item)" title="Excluir">
+                  <svg class="svg-icon xs" viewBox="0 0 24 24">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
       </div>
 
       <!-- FLOATING SELECTION BAR -->
