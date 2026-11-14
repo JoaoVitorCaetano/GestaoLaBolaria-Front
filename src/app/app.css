@@ -1,0 +1,250 @@
+.shell-layout {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-surface);
+  transition: grid-template-columns 0.2s ease;
+}
+
+.shell-layout.collapsed {
+  grid-template-columns: 68px 1fr;
+}
+
+/* ==================== SIDEBAR ==================== */
+.sidebar {
+  background: #f8f9fb;
+  border-right: 1px solid var(--border-color);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.shell-layout.collapsed .sidebar {
+  padding: 14px 8px;
+  align-items: center;
+}
+
+.company-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  width: 100%;
+}
+
+.shell-layout.collapsed .company-card {
+  padding: 8px;
+  justify-content: center;
+}
+
+.company-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #18181b;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.company-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.company-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.company-plan {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.collapse-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.collapse-btn:hover {
+  background: #f2f4f7;
+  color: var(--text-primary);
+}
+
+/* Sidebar Search */
+.sidebar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff1f5;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+
+.sidebar-search .s-icon {
+  color: var(--text-muted);
+}
+
+.sidebar-search input {
+  border: none;
+  background: transparent;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  width: 100%;
+  outline: none;
+}
+
+.kbd-badge {
+  background: #ffffff;
+  border: 1px solid #dcdfe4;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Sections */
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.nav-section-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #98a2b3;
+  padding: 0 10px;
+  margin-bottom: 2px;
+}
+
+.nav-list,
+.workspace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nav-item,
+.ws-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  border: 1px solid transparent;
+  transition: all 0.14s ease;
+}
+
+.shell-layout.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px;
+}
+
+.nav-item:hover,
+.ws-item:hover {
+  background: #eff1f5;
+  color: var(--text-primary);
+}
+
+/* Active item with white card + left orange bar */
+.nav-item.active {
+  background: #ffffff;
+  color: var(--text-primary);
+  font-weight: 600;
+  border-color: var(--border-color);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 6px;
+  bottom: 6px;
+  width: 3.5px;
+  border-radius: 0 4px 4px 0;
+  background: var(--accent-orange);
+}
+
+.shell-layout.collapsed .nav-item.active::before {
+  left: -8px;
+}
+
+.nav-text,
+.ws-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-pill {
+  background: #eef0f4;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 5px;
+}
+
+.ws-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2.5px;
+  flex-shrink: 0;
+}
+
+.ws-dot.purple { background: #6366f1; }
+.ws-dot.orange { background: #ff5a1f; }
+.ws-dot.pink { background: #ec4899; }
+.ws-dot.green { background: #10b981; }
+
+.workspace-main {
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-surface);
+}
