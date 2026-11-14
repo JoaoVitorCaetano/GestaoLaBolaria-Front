@@ -6,13 +6,14 @@ import {
   ItemFichaTecnicaRequest,
   ItemFichaTecnicaResponse,
 } from '../models/api.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FichaTecnicaService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/produtos';
+  private readonly baseUrl = `${environment.apiUrl}/produtos`;
 
   listarPorProduto(produtoId: number): Observable<FichaTecnicaResponse> {
     return this.http.get<FichaTecnicaResponse>(`${this.baseUrl}/${produtoId}/itens`);

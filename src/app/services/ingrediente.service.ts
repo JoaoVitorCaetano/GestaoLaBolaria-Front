@@ -6,13 +6,14 @@ import {
   IngredienteResponse,
   PageResponse,
 } from '../models/api.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class IngredienteService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/ingredientes';
+  private readonly apiUrl = `${environment.apiUrl}/ingredientes`;
 
   listar(page = 0, size = 200): Observable<PageResponse<IngredienteResponse>> {
     const params = new HttpParams()
